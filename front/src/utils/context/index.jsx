@@ -1,32 +1,15 @@
 import { waitForElementToBeRemoved } from '@testing-library/react';
 import React, { useState, createContext } from 'react';
 
-export const ThemeContext = createContext();
+export const LoggedContext = createContext();
 
-export const ThemeProvider = ({ children }) => {
-    const [theme, setTheme] = useState('light');
-    const toggleTheme = () => {
-        setTheme(theme === 'light' ? 'dark' : 'light');
-    };
+export const LoggedProvider = ({ children }) => {
+    const [logged, setLogged] = useState(false);
+    const [user, setUser] = useState({});
 
     return (
-        <ThemeContext.Provider value={{ theme, toggleTheme }}>
+        <LoggedContext.Provider value={{ logged, setLogged, user, setUser }}>
             {children}
-        </ThemeContext.Provider>
-    );
-};
-
-export const SurveyContext = createContext();
-
-export const SurveyProvider = ({ children }) => {
-    const [answers, setAnswers] = useState({});
-    const saveAnswers = (newAnswers) => {
-        setAnswers({ ...answers, ...newAnswers });
-    };
-
-    return (
-        <SurveyContext.Provider value={{ answers, saveAnswers }}>
-            {children}
-        </SurveyContext.Provider>
+        </LoggedContext.Provider>
     );
 };
