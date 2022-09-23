@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
+import Modify from './pages/Modify';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Error from './components/Error';
@@ -19,6 +20,9 @@ ReactDOM.render(
                 <Switch>
                     <Route exact path="/">
                         <Dashboard />
+                    </Route>
+                    <Route path="/modify/:id">
+                        <Modify />
                     </Route>
                     <Route path="/login">
                         <Login />

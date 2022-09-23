@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 
 const path = require('path');
 
-const sauceRoutes = require('./routes/sauce');
+const publicationRoutes = require('./routes/publication');
 const userRoutes = require('./routes/user');
 
 mongoose.connect('mongodb+srv://OpenClassrooms:1234@cluster0.diiyn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
@@ -25,7 +25,7 @@ app.use((req, res, next) => {
   });
 
 app.use('/images', express.static(path.join(__dirname, 'images')));
-app.use('/api/sauces', sauceRoutes);
+app.use('/api/publications', publicationRoutes);
 app.use('/api/auth', userRoutes);
 
 module.exports = app;

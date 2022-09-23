@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
-import Card from '../../components/Card';
+import Publication from '../../components/Publication';
 import styled from 'styled-components';
 import colors from '../../utils/style/colors';
-import { Loader } from '../../utils/style/Atoms';
+import { Loader } from '../../utils/style/Common';
 import { LoggedContext } from '../../utils/context';
 import { useContext } from 'react';
-import { Redirect } from 'react-router';
 
-const CardsContainer = styled.div`
+const DashboardWrapper = styled.div``;
+
+const PublicationsContainer = styled.div`
     display: grid;
     gap: 24px;
     grid-template-rows: 350px 350px;
@@ -16,41 +17,79 @@ const CardsContainer = styled.div`
     justify-items: center;
 `;
 
-const PageTitle = styled.h1`
-    font-size: 30px;
-    color: black;
-    text-align: center;
-    padding-bottom: 30px;
-`;
+const PublicationCreatorWrapper = styled.div``;
 
-const PageSubtitle = styled.h2`
-    font-size: 20px;
-    color: ${colors.secondary};
-    font-weight: 300;
-    text-align: center;
-    padding-bottom: 30px;
+const TextAreaWrapper = styled.textarea`
+    resize: none;
 `;
+const InputImgWrapper = styled.input``;
+
 const LoaderWrapper = styled.div`
     display: flex;
     justify-content: center;
 `;
 
 function Dashboard() {
-    const { logged } = useContext(LoggedContext);
-
     const [isDataLoading, setDataLoading] = useState(false);
     const [error, setError] = useState(false);
-    const [freelancersList, setFreelancesList] = useState([]);
+    const [publicationsList, setPublicationsList] = useState([]);
+    const [publicationCreated, setPublicationCreated] = useState(false);
+    const { userLogged, setUserLogged } = useContext(LoggedContext);
+
+    async function createPublication(e) {
+        e.preventDefault();
+        const formData = new FormData(),
+            text = e.target['textCreator'].value,
+            image = e.target['imageCreator'].files[0];
+
+        formData.append('userId', userLogged.userId);
+        formData.append('text', text);
+        formData.append('image', image);
+
+        try {
+            const response = await fetch(
+                `http://localhost:3001/api/publications/`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + userLogged.token,
+                    },
+                    body: formData,
+                }
+            );
+            if (response.ok) {
+                setPublicationCreated(
+                    publicationCreated === true ? false : true
+                );
+            } else {
+                localStorage.removeItem('user');
+                window.location = '/login';
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
 
     useEffect(() => {
-        async function fetchFreelances() {
+        async function fetchPublications(user) {
             setDataLoading(true);
             try {
                 const response = await fetch(
-                    `http://localhost:8000/freelances`
+                    `http://localhost:3001/api/publications/`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            Authorization: 'Bearer ' + user.token,
+                        },
+                    }
                 );
-                const { freelancersList } = await response.json();
-                setFreelancesList(freelancersList);
+                if (response.ok) {
+                    const data = await response.json();
+                    setPublicationsList(data);
+                } else {
+                    localStorage.removeItem('user');
+                    window.location = '/login';
+                }
             } catch (err) {
                 console.log(err);
                 setError(true);
@@ -58,39 +97,67 @@ function Dashboard() {
                 setDataLoading(false);
             }
         }
-        fetchFreelances();
-    }, []);
+        if (localStorage.user !== undefined) {
+            const user = JSON.parse(localStorage.user);
+            setUserLogged(user);
+            fetchPublications(user);
+        } else {
+            window.location = '/login';
+        }
+    }, [publicationCreated]);
 
     if (error) {
         return <span>Oups il y a eu un problème</span>;
     }
 
-    if (!logged) {
-        return <Redirect to="/login" />;
-    }
     return (
-        <div>
-            <PageTitle>Trouvez votre prestataire</PageTitle>
-            <PageSubtitle>
-                Chez Shiny nous réunissons les meilleurs profils pour vous.
-            </PageSubtitle>
+        <DashboardWrapper>
+            <PublicationCreatorWrapper>
+                <h1>Créer une publication</h1>
+                <form onSubmit={createPublication}>
+                    <TextAreaWrapper
+                        id="textCreator"
+                        name="textCreator"
+                        cols="50"
+                        rows="5"
+                    ></TextAreaWrapper>
+                    <div>
+                        <label htmlFor="imageCreator">
+                            Ajouter une image :
+                        </label>
+                        <InputImgWrapper
+                            type="file"
+                            id="imageCreator"
+                            name="imageCreator"
+                            accept="image/png, image/jpeg"
+                        />
+                    </div>
+                    <input
+                        type="submit"
+                        name="submit"
+                        id="submit"
+                        value="Publier"
+                    />
+                </form>
+            </PublicationCreatorWrapper>
             {isDataLoading ? (
                 <LoaderWrapper>
                     <Loader />
                 </LoaderWrapper>
             ) : (
-                <CardsContainer>
-                    {freelancersList.map((profile, index) => (
-                        <Card
-                            key={`${profile.name}-${index}`}
-                            label={profile.job}
-                            title={profile.name}
-                            picture={profile.picture}
+                <PublicationsContainer>
+                    {publicationsList.map((publication, index) => (
+                        <Publication
+                            key={`${publication._id}-${index}`}
+                            publicationId={publication._id}
+                            text={publication.text}
+                            picture={publication.imageUrl}
+                            userId={publication.userId}
                         />
                     ))}
-                </CardsContainer>
+                </PublicationsContainer>
             )}
-        </div>
+        </DashboardWrapper>
     );
 }
 
