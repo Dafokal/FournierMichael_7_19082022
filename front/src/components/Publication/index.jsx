@@ -5,6 +5,7 @@ import colors from '../../utils/style/colors';
 import DefaultPicture from '../../assets/profile.png';
 import { LoggedContext } from '../../utils/context';
 import { useContext } from 'react';
+import { useState } from 'react';
 
 const PublicationText = styled.span`
     color: #5843e4;
@@ -25,31 +26,129 @@ const PublicationWrapper = styled.div`
     flex-direction: column;
     justify-content: space-around;
     padding: 15px;
-    background-color: ${colors.backgroundLight};
+    background-color: black;
     border-radius: 30px;
     width: 300px;
     height: 300px;
     transition: 200ms;
+    color: white;
     &:hover {
         cursor: pointer;
         box-shadow: 2px 2px 10px #e2e3e9;
     }
 `;
 
-function Publication({ publicationId, text, picture, userId }) {
+const ActionsWrapper = styled.div``;
+
+function Publication({
+    publicationId,
+    likes,
+    dislikes,
+    usersLiked,
+    usersDisliked,
+    text,
+    picture,
+    userId,
+    setReloadPublications,
+    reloadPublications,
+}) {
     const { userLogged, setUserLogged } = useContext(LoggedContext);
+
+    async function deletePublication(e) {
+        e.preventDefault();
+        try {
+            const response = await fetch(
+                `http://localhost:3001/api/publications/${publicationId}`,
+                {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: 'Bearer ' + userLogged.token,
+                    },
+                }
+            );
+            if (response.ok) {
+                setReloadPublications(
+                    reloadPublications === true ? false : true
+                );
+            } else {
+                //localStorage.removeItem('user');
+                //window.location = '/login';
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
+    async function likePublication(likeValue) {
+        try {
+            const response = await fetch(
+                `http://localhost:3001/api/publications/${publicationId}/like`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: 'Bearer ' + userLogged.token,
+                        'Content-type': 'application/json; charset=UTF-8',
+                    },
+                    body: JSON.stringify({
+                        userId: userLogged.userId,
+                        like: likeValue,
+                    }),
+                }
+            );
+            if (response.ok) {
+                setReloadPublications(
+                    reloadPublications === true ? false : true
+                );
+            } else {
+                localStorage.removeItem('user');
+                window.location = '/login';
+            }
+        } catch (err) {
+            console.log(err);
+        }
+    }
     return (
         <PublicationWrapper>
             <PublicationText>{text}</PublicationText>
-            <PublicationImage src={picture} alt="freelance" />
-            {userLogged.userId === userId ? (
-                <div>
-                    <Link to={`/modify/${publicationId}`}>Modifier</Link>
-                    <a>Supprimer</a>
-                </div>
-            ) : (
+            {picture === '' ? (
                 ''
+            ) : (
+                <PublicationImage src={picture} alt="freelance" />
             )}
+            <ActionsWrapper>
+                {userLogged.userId === userId ? (
+                    <div>
+                        <Link to={`/modify/${publicationId}`}>Modifier</Link>
+                        <button onClick={deletePublication}>Supprimer</button>
+                    </div>
+                ) : (
+                    ''
+                )}
+                <div>
+                    <span>{likes}</span>
+                    <button
+                        onClick={() =>
+                            likePublication(
+                                usersLiked.includes(userLogged.userId) ? 0 : 1
+                            )
+                        }
+                    >
+                        J'aime
+                    </button>
+                    <span>{dislikes}</span>
+                    <button
+                        onClick={() =>
+                            likePublication(
+                                usersDisliked.includes(userLogged.userId)
+                                    ? 0
+                                    : -1
+                            )
+                        }
+                    >
+                        Je n'aime pas
+                    </button>
+                </div>
+            </ActionsWrapper>
         </PublicationWrapper>
     );
 }
@@ -63,7 +162,7 @@ Publication.propTypes = {
 Publication.defaultProps = {
     text: '',
     userId: '',
-    picture: DefaultPicture,
+    picture: '',
 };
 
 export default Publication;

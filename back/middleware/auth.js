@@ -11,9 +11,7 @@ module.exports = (req, res, next) => {
     } else {
       next();
     }
-  } catch {
-    res.status(403).json({
-      error: new Error('403: Unauthorized request')
-    });
+  } catch(error) {
+    res.status(403).json({error});
   }
 };

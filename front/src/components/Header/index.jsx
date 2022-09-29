@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { StyledLink } from '../../utils/style/Common';
 import DefaultLogo from '../../assets/logo-default.svg';
+import colors from '../../utils/style/colors';
 
 const HomeLogo = styled.img`
     width: 20em;
@@ -23,7 +24,12 @@ function Header() {
             </Link>
             <div>
                 <StyledLink to="/">Accueil</StyledLink>
-                <StyledLink to="/login">Se déconnecter</StyledLink>
+                <StyledLink
+                    to="/login"
+                    onClick={() => localStorage.removeItem('user')}
+                >
+                    Se déconnecter
+                </StyledLink>
             </div>
         </NavContainer>
     );

@@ -5,6 +5,7 @@ import colors from '../../utils/style/colors';
 import { Loader } from '../../utils/style/Common';
 import { LoggedContext } from '../../utils/context';
 import { useContext } from 'react';
+import { useFetchPublications } from '../../utils/hooks';
 
 const DashboardWrapper = styled.div``;
 
@@ -30,11 +31,13 @@ const LoaderWrapper = styled.div`
 `;
 
 function Dashboard() {
-    const [isDataLoading, setDataLoading] = useState(false);
-    const [error, setError] = useState(false);
-    const [publicationsList, setPublicationsList] = useState([]);
-    const [publicationCreated, setPublicationCreated] = useState(false);
+    const [reloadPublications, setReloadPublications] = useState(false);
     const { userLogged, setUserLogged } = useContext(LoggedContext);
+
+    const { isDataLoading, publications, error } = useFetchPublications(
+        `http://localhost:3001/api/publications/`,
+        [reloadPublications]
+    );
 
     async function createPublication(e) {
         e.preventDefault();
@@ -58,9 +61,11 @@ function Dashboard() {
                 }
             );
             if (response.ok) {
-                setPublicationCreated(
-                    publicationCreated === true ? false : true
+                setReloadPublications(
+                    reloadPublications === true ? false : true
                 );
+                e.target['textCreator'].value = '';
+                e.target['imageCreator'].value = '';
             } else {
                 localStorage.removeItem('user');
                 window.location = '/login';
@@ -69,42 +74,6 @@ function Dashboard() {
             console.log(err);
         }
     }
-
-    useEffect(() => {
-        async function fetchPublications(user) {
-            setDataLoading(true);
-            try {
-                const response = await fetch(
-                    `http://localhost:3001/api/publications/`,
-                    {
-                        method: 'GET',
-                        headers: {
-                            Authorization: 'Bearer ' + user.token,
-                        },
-                    }
-                );
-                if (response.ok) {
-                    const data = await response.json();
-                    setPublicationsList(data);
-                } else {
-                    localStorage.removeItem('user');
-                    window.location = '/login';
-                }
-            } catch (err) {
-                console.log(err);
-                setError(true);
-            } finally {
-                setDataLoading(false);
-            }
-        }
-        if (localStorage.user !== undefined) {
-            const user = JSON.parse(localStorage.user);
-            setUserLogged(user);
-            fetchPublications(user);
-        } else {
-            window.location = '/login';
-        }
-    }, [publicationCreated]);
 
     if (error) {
         return <span>Oups il y a eu un problème</span>;
@@ -146,13 +115,19 @@ function Dashboard() {
                 </LoaderWrapper>
             ) : (
                 <PublicationsContainer>
-                    {publicationsList.map((publication, index) => (
+                    {publications.map((publication, index) => (
                         <Publication
                             key={`${publication._id}-${index}`}
                             publicationId={publication._id}
+                            likes={publication.likes}
+                            dislikes={publication.dislikes}
+                            usersLiked={publication.usersLiked}
+                            usersDisliked={publication.usersDisliked}
                             text={publication.text}
                             picture={publication.imageUrl}
                             userId={publication.userId}
+                            setReloadPublications={setReloadPublications}
+                            reloadPublications={reloadPublications}
                         />
                     ))}
                 </PublicationsContainer>
