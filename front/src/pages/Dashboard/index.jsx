@@ -5,39 +5,112 @@ import colors from '../../utils/style/colors';
 import { Loader } from '../../utils/style/Common';
 import { LoggedContext } from '../../utils/context';
 import { useContext } from 'react';
-import { useFetchPublications } from '../../utils/hooks';
+import { useFetch } from '../../utils/hooks';
+import LogoAddImg from '../../assets/logo-addImg.png';
+import LogoSend from '../../assets/logo-send.png';
 
-const DashboardWrapper = styled.div``;
-
-const PublicationsContainer = styled.div`
-    display: grid;
-    gap: 24px;
-    grid-template-rows: 350px 350px;
-    grid-template-columns: repeat(2, 1fr);
+const DashboardWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-items: center;
+    padding: 0 2em;
 `;
-
-const PublicationCreatorWrapper = styled.div``;
-
+const PublicationCreator = styled.div`
+    width: 100%;
+    max-width: 70em;
+    margin: 1.5em 0 1em;
+    text-align: center;
+`;
+const FormWrapper = styled.form`
+    width: 100%;
+    margin-top: 1em;
+    display: flex;
+`;
 const TextAreaWrapper = styled.textarea`
+    width: 100%;
+    font-size: 1.5em;
     resize: none;
+    border: 1px solid ${colors.tertiary};
+    padding: 1em;
+    border-radius: 1.5em 0 0 1.5em;
+    transition: background-color ease-in-out 150ms;
+    &:focus {
+        background-color: #f7f7f7;
+    }
 `;
-const InputImgWrapper = styled.input``;
-
+const CreatorMenuWrapper = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid ${colors.tertiary};
+    border-left: none;
+    border-radius: 0 2em 2em 0;
+    overflow: hidden;
+`;
+const ImgFieldWrapper = styled.label`
+    width: 100%;
+    flex: 0 0 50%;
+    cursor: pointer;
+    width: max-content;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    & input {
+        display: none;
+    }
+    & img {
+        width: 2.3em;
+        transition: transform ease-in-out 100ms;
+    }
+    &:hover img {
+        transform: scale(1.1);
+    }
+`;
+const PublishBtnWrapper = styled.label`
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1em 1.2em;
+    font-size: 1.3em;
+    color: black;
+    border: none;
+    cursor: pointer;
+    flex: 0 0 50%;
+    transition: background-color ease-in-out 100ms;
+    & input {
+        display: none;
+    }
+    & img {
+        width: 1.7em;
+        transition: transform ease-in-out 100ms;
+    }
+    &:hover img {
+        transform: scale(1.1);
+    }
+`;
 const LoaderWrapper = styled.div`
     display: flex;
     justify-content: center;
+`;
+const PublicationsContainer = styled.div`
+    width: 100%;
+    max-width: 70em;
 `;
 
 function Dashboard() {
     const [reloadPublications, setReloadPublications] = useState(false);
     const { userLogged, setUserLogged } = useContext(LoggedContext);
 
-    const { isDataLoading, publications, error } = useFetchPublications(
+    const { isDataLoading, data, error } = useFetch(
         `http://localhost:3001/api/publications/`,
         [reloadPublications]
     );
+
+    data.sort((a, b) => {
+        return parseInt(a.date) < parseInt(b.date) ? 1 : -1;
+    });
 
     async function createPublication(e) {
         e.preventDefault();
@@ -81,41 +154,44 @@ function Dashboard() {
 
     return (
         <DashboardWrapper>
-            <PublicationCreatorWrapper>
+            <PublicationCreator>
                 <h1>Créer une publication</h1>
-                <form onSubmit={createPublication}>
+                <FormWrapper onSubmit={createPublication}>
                     <TextAreaWrapper
+                        required
                         id="textCreator"
                         name="textCreator"
-                        cols="50"
                         rows="5"
                     ></TextAreaWrapper>
-                    <div>
-                        <label htmlFor="imageCreator">
-                            Ajouter une image :
-                        </label>
-                        <InputImgWrapper
-                            type="file"
-                            id="imageCreator"
-                            name="imageCreator"
-                            accept="image/png, image/jpeg"
-                        />
-                    </div>
-                    <input
-                        type="submit"
-                        name="submit"
-                        id="submit"
-                        value="Publier"
-                    />
-                </form>
-            </PublicationCreatorWrapper>
+                    <CreatorMenuWrapper>
+                        <ImgFieldWrapper htmlFor="imageCreator">
+                            <img src={LogoAddImg} alt="Ajouter"></img>
+                            <input
+                                type="file"
+                                id="imageCreator"
+                                name="imageCreator"
+                                accept="image/png, image/jpeg"
+                            />
+                        </ImgFieldWrapper>
+                        <PublishBtnWrapper htmlFor="submit">
+                            <img src={LogoSend} alt="Publier"></img>
+                            <input
+                                type="submit"
+                                name="submit"
+                                id="submit"
+                                value="Publier"
+                            />
+                        </PublishBtnWrapper>
+                    </CreatorMenuWrapper>
+                </FormWrapper>
+            </PublicationCreator>
             {isDataLoading ? (
                 <LoaderWrapper>
                     <Loader />
                 </LoaderWrapper>
             ) : (
                 <PublicationsContainer>
-                    {publications.map((publication, index) => (
+                    {data.map((publication, index) => (
                         <Publication
                             key={`${publication._id}-${index}`}
                             publicationId={publication._id}
@@ -126,6 +202,7 @@ function Dashboard() {
                             text={publication.text}
                             picture={publication.imageUrl}
                             userId={publication.userId}
+                            date={publication.date}
                             setReloadPublications={setReloadPublications}
                             reloadPublications={reloadPublications}
                         />

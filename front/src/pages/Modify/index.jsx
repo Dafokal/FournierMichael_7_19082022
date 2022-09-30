@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { LoggedContext } from '../../utils/context';
 import { useContext } from 'react';
-import { useFetchPublications } from '../../utils/hooks';
+import { useFetch } from '../../utils/hooks';
 
 const LoaderWrapper = styled.div`
     display: flex;
@@ -22,7 +22,7 @@ function Modify() {
     const publicationId = useParams().id;
     const { userLogged, setUserLogged } = useContext(LoggedContext);
 
-    const { isDataLoading, publications, error } = useFetchPublications(
+    const { isDataLoading, data, error } = useFetch(
         `http://localhost:3001/api/publications/${publicationId}`,
         []
     );
@@ -76,9 +76,9 @@ function Modify() {
                         name="textCreator"
                         cols="50"
                         rows="5"
-                        defaultValue={publications.text}
+                        defaultValue={data.text}
                     ></TextAreaWrapper>
-                    <img src={publications.imageUrl} alt="publication" />
+                    <img src={data.imageUrl} alt="publication" />
                     <div>
                         <label htmlFor="imageCreator">Modifier l'image :</label>
                         <InputImgWrapper

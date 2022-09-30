@@ -2,10 +2,10 @@ import { LoggedContext } from '../../utils/context';
 import { useContext } from 'react';
 import { useEffect, useState } from 'react';
 
-export function useFetchPublications(url, trigger) {
+export function useFetch(url, trigger) {
     const [isDataLoading, setDataLoading] = useState(false);
     const [error, setError] = useState(false);
-    const [publications, setPublications] = useState([]);
+    const [data, setData] = useState([]);
     const { userLogged, setUserLogged } = useContext(LoggedContext);
     useEffect(() => {
         async function fetchPublications(user) {
@@ -18,8 +18,8 @@ export function useFetchPublications(url, trigger) {
                     },
                 });
                 if (response.ok) {
-                    const data = await response.json();
-                    setPublications(data);
+                    const responseData = await response.json();
+                    setData(responseData);
                 } else {
                     localStorage.removeItem('user');
                     window.location = '/login';
@@ -39,5 +39,5 @@ export function useFetchPublications(url, trigger) {
             window.location = '/login';
         }
     }, trigger);
-    return { isDataLoading, publications, error };
+    return { isDataLoading, data, error };
 }

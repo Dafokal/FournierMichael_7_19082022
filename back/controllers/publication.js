@@ -11,7 +11,8 @@ exports.createPublication = (req, res, next) => {
         likes: 0,
         dislikes: 0,
         usersLiked: [],
-        usersDisliked: []
+        usersDisliked: [],
+        date: Date.now()
     });
     req.file ? publication['imageUrl'] = `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : "";
     publication.save()

@@ -43,3 +43,14 @@ exports.login = (req, res, next) => {
             })
         .catch(error => res.status(500).json({ error }));
 };
+
+exports.getUserName = (req, res, next) => {
+    User.findOne({ _id: req.params.id })
+        .then(user => {
+                return res.status(200).json({
+                    name: user.name,
+                    surname: user.surname
+                })
+            })
+        .catch(error => res.status(500).json({ error }));
+};
