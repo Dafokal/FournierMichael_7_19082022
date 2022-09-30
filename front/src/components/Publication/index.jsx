@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 import colors from '../../utils/style/colors';
 import { LoggedContext } from '../../utils/context';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { useState } from 'react';
 import { useFetch } from '../../utils/hooks';
 import iconLike from '../../assets/icon-like.png';
@@ -92,6 +92,9 @@ function Publication({
     reloadPublications,
 }) {
     const { userLogged, setUserLogged } = useContext(LoggedContext);
+    const [userLike, setUserLike] = useState(0);
+    const [likeCount, setLikeCount] = useState(likes);
+    const [dislikeCount, setDislikeCount] = useState(dislikes);
     const dateString = new Date(parseInt(date)).toLocaleDateString('fr-FR');
     const timeString = new Date(parseInt(date))
         .toLocaleTimeString('fr-FR')
@@ -102,6 +105,14 @@ function Publication({
         `http://localhost:3001/api/auth/${userId}`,
         []
     );
+
+    useEffect(() => {
+        if (usersLiked.includes(userLogged.userId)) {
+            setUserLike(1);
+        } else if (usersDisliked.includes(userLogged.userId)) {
+            setUserLike(-1);
+        }
+    }, []);
 
     async function deletePublication(e) {
         e.preventDefault();
@@ -128,7 +139,7 @@ function Publication({
         }
     }
 
-    async function likePublication(likeValue) {
+    async function likePublication(e, likeValue) {
         try {
             const response = await fetch(
                 `http://localhost:3001/api/publications/${publicationId}/like`,
@@ -145,9 +156,18 @@ function Publication({
                 }
             );
             if (response.ok) {
-                setReloadPublications(
-                    reloadPublications === true ? false : true
-                );
+                if (likeValue === 1) {
+                    setLikeCount(likeCount + 1);
+                    if (userLike === -1) setDislikeCount(dislikeCount - 1);
+                } else if (likeValue === -1) {
+                    setDislikeCount(dislikeCount + 1);
+                    if (userLike === 1) setLikeCount(likeCount - 1);
+                } else {
+                    userLike === 1
+                        ? setLikeCount(likeCount - 1)
+                        : setDislikeCount(dislikeCount - 1);
+                }
+                setUserLike(likeValue);
             } else {
                 localStorage.removeItem('user');
                 window.location = '/login';
@@ -175,48 +195,32 @@ function Publication({
             <ActionsWrapper>
                 <LikeFieldWrapper>
                     <LikeBtnWrapper>
-                        <span>{likes}</span>
+                        <span>{likeCount}</span>
                         <img
                             alt="J'aime"
-                            src={
-                                usersLiked.includes(userLogged.userId)
-                                    ? iconLiked
-                                    : iconLike
-                            }
+                            src={userLike === 1 ? iconLiked : iconLike}
                         />
                         <input
                             type="button"
                             name="buttonLike"
                             value="buttonLike"
-                            onClick={() =>
-                                likePublication(
-                                    usersLiked.includes(userLogged.userId)
-                                        ? 0
-                                        : 1
-                                )
+                            onClick={(e) =>
+                                likePublication(e, userLike === 1 ? 0 : 1)
                             }
                         />
                     </LikeBtnWrapper>
                     <LikeBtnWrapper>
-                        <span>{dislikes}</span>
+                        <span>{dislikeCount}</span>
                         <img
                             alt="Je n'aime pas"
-                            src={
-                                usersDisliked.includes(userLogged.userId)
-                                    ? iconDisliked
-                                    : iconDislike
-                            }
+                            src={userLike === -1 ? iconDisliked : iconDislike}
                         />
                         <input
                             type="button"
-                            name="buttonLike"
-                            value="buttonLike"
-                            onClick={() =>
-                                likePublication(
-                                    usersDisliked.includes(userLogged.userId)
-                                        ? 0
-                                        : -1
-                                )
+                            name="buttonDislike"
+                            value="buttonDislike"
+                            onClick={(e) =>
+                                likePublication(e, userLike === -1 ? 0 : -1)
                             }
                         />
                     </LikeBtnWrapper>
