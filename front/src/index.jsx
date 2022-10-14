@@ -10,31 +10,31 @@ import Footer from './components/Footer';
 import Error from './components/Error';
 import GlobalStyle from './utils/style/GlobalStyle';
 import { LoggedProvider } from './utils/context';
+import { EditProvider } from './utils/context';
 
 ReactDOM.render(
     <React.StrictMode>
         <Router>
             <LoggedProvider>
-                <GlobalStyle />
-                <Header />
-                <Switch>
-                    <Route exact path="/">
-                        <Dashboard />
-                    </Route>
-                    <Route path="/modify/:id">
-                        <Modify />
-                    </Route>
-                    <Route path="/login">
-                        <Login />
-                    </Route>
-                    <Route path="/signup">
-                        <Signup />
-                    </Route>
-                    <Route>
-                        <Error />
-                    </Route>
-                </Switch>
-                <Footer />
+                <EditProvider>
+                    <GlobalStyle />
+                    <Header />
+                    <Switch>
+                        <Route exact path="/">
+                            <Dashboard />
+                        </Route>
+                        <Route path="/login">
+                            <Login />
+                        </Route>
+                        <Route path="/signup">
+                            <Signup />
+                        </Route>
+                        <Route>
+                            <Error />
+                        </Route>
+                    </Switch>
+                    <Footer />
+                </EditProvider>
             </LoggedProvider>
         </Router>
     </React.StrictMode>,

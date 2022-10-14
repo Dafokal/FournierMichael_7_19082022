@@ -4,10 +4,11 @@ import styled from 'styled-components';
 import colors from '../../utils/style/colors';
 import { Loader } from '../../utils/style/Common';
 import { LoggedContext } from '../../utils/context';
+import { EditContext } from '../../utils/context';
 import { useContext } from 'react';
 import { useFetch } from '../../utils/hooks';
-import LogoAddImg from '../../assets/logo-addImg.png';
-import LogoSend from '../../assets/logo-send.png';
+import iconPhoto from '../../assets/icon-photo.svg';
+import iconSend from '../../assets/icon-send.svg';
 
 const DashboardWrapper = styled.div`
     display: flex;
@@ -30,7 +31,7 @@ const TextAreaWrapper = styled.textarea`
     width: 100%;
     font-size: 1.5em;
     resize: none;
-    border: 1px solid ${colors.tertiary};
+    border: 1px solid ${colors.grayLight};
     padding: 1em;
     border-radius: 1.5em 0 0 1.5em;
     transition: background-color ease-in-out 150ms;
@@ -42,7 +43,7 @@ const CreatorMenuWrapper = styled.div`
     display: flex;
     flex-direction: column;
     align-items: center;
-    border: 1px solid ${colors.tertiary};
+    border: 1px solid ${colors.grayLight};
     border-left: none;
     border-radius: 0 2em 2em 0;
     overflow: hidden;
@@ -83,7 +84,7 @@ const PublishBtnWrapper = styled.label`
         display: none;
     }
     & img {
-        width: 1.7em;
+        width: 2em;
         transition: transform ease-in-out 100ms;
     }
     &:hover img {
@@ -102,6 +103,7 @@ const PublicationsContainer = styled.div`
 function Dashboard() {
     const [reloadPublications, setReloadPublications] = useState(false);
     const { userLogged, setUserLogged } = useContext(LoggedContext);
+    const { isEditing, setIsEditing } = useContext(EditContext);
 
     const { isDataLoading, data, error } = useFetch(
         `http://localhost:3001/api/publications/`,
@@ -137,6 +139,7 @@ function Dashboard() {
                 setReloadPublications(
                     reloadPublications === true ? false : true
                 );
+                setIsEditing(false);
                 e.target['textCreator'].value = '';
                 e.target['imageCreator'].value = '';
             } else {
@@ -165,7 +168,7 @@ function Dashboard() {
                     ></TextAreaWrapper>
                     <CreatorMenuWrapper>
                         <ImgFieldWrapper htmlFor="imageCreator">
-                            <img src={LogoAddImg} alt="Ajouter"></img>
+                            <img src={iconPhoto} alt="Ajouter"></img>
                             <input
                                 type="file"
                                 id="imageCreator"
@@ -174,7 +177,7 @@ function Dashboard() {
                             />
                         </ImgFieldWrapper>
                         <PublishBtnWrapper htmlFor="submit">
-                            <img src={LogoSend} alt="Publier"></img>
+                            <img src={iconSend} alt="Publier"></img>
                             <input
                                 type="submit"
                                 name="submit"
