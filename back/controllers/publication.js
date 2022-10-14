@@ -31,9 +31,9 @@ exports.modifyPublication = (req, res, next) => {
         .then(publication => {
             const previousFilename = publication.imageUrl ? publication.imageUrl.split('/images/')[1] : undefined;
             const publicationObject = req.file? {
-                ...req.body,
+                text: req.body.text,
                 imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-            } : { ...req.body };
+            } : { text: req.body.text };
             Publication.updateOne({ _id: req.params.id }, { ...publicationObject, _id: req.params.id })
                 .then(() => {
                     if (previousFilename && req.file) {

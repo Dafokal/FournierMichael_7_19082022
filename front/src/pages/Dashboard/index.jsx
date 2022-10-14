@@ -1,7 +1,5 @@
 import { useEffect, useState } from 'react';
 import Publication from '../../components/Publication';
-import styled from 'styled-components';
-import colors from '../../utils/style/colors';
 import { Loader } from '../../utils/style/Common';
 import { LoggedContext } from '../../utils/context';
 import { EditContext } from '../../utils/context';
@@ -9,110 +7,27 @@ import { useContext } from 'react';
 import { useFetch } from '../../utils/hooks';
 import iconPhoto from '../../assets/icon-photo.svg';
 import iconSend from '../../assets/icon-send.svg';
-
-const DashboardWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 2em;
-`;
-const PublicationCreator = styled.div`
-    width: 100%;
-    max-width: 70em;
-    margin: 1.5em 0 1em;
-    text-align: center;
-`;
-const FormWrapper = styled.form`
-    width: 100%;
-    margin-top: 1em;
-    display: flex;
-`;
-const TextAreaWrapper = styled.textarea`
-    width: 100%;
-    font-size: 1.5em;
-    resize: none;
-    border: 1px solid ${colors.grayLight};
-    padding: 1em;
-    border-radius: 1.5em 0 0 1.5em;
-    transition: background-color ease-in-out 150ms;
-    &:focus {
-        background-color: #f7f7f7;
-    }
-`;
-const CreatorMenuWrapper = styled.div`
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border: 1px solid ${colors.grayLight};
-    border-left: none;
-    border-radius: 0 2em 2em 0;
-    overflow: hidden;
-`;
-const ImgFieldWrapper = styled.label`
-    width: 100%;
-    flex: 0 0 50%;
-    cursor: pointer;
-    width: max-content;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    & input {
-        display: none;
-    }
-    & img {
-        width: 2.3em;
-        transition: transform ease-in-out 100ms;
-    }
-    &:hover img {
-        transform: scale(1.1);
-    }
-`;
-const PublishBtnWrapper = styled.label`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 1em 1.2em;
-    font-size: 1.3em;
-    color: black;
-    border: none;
-    cursor: pointer;
-    flex: 0 0 50%;
-    transition: background-color ease-in-out 100ms;
-    & input {
-        display: none;
-    }
-    & img {
-        width: 2em;
-        transition: transform ease-in-out 100ms;
-    }
-    &:hover img {
-        transform: scale(1.1);
-    }
-`;
-const LoaderWrapper = styled.div`
-    display: flex;
-    justify-content: center;
-`;
-const PublicationsContainer = styled.div`
-    width: 100%;
-    max-width: 70em;
-`;
+import {
+    DashboardWrapper,
+    PublicationCreator,
+    FormWrapper,
+    CreatorAreaWrapper,
+    TextAreaWrapper,
+    CreatorMenuWrapper,
+    ImgFieldWrapper,
+    PublishBtnWrapper,
+    LoaderWrapper,
+    PublicationsContainer,
+} from './style.jsx';
 
 function Dashboard() {
-    const [reloadPublications, setReloadPublications] = useState(false);
-    const { userLogged, setUserLogged } = useContext(LoggedContext);
-    const { isEditing, setIsEditing } = useContext(EditContext);
-
-    const { isDataLoading, data, error } = useFetch(
-        `http://localhost:3001/api/publications/`,
-        [reloadPublications]
-    );
-
-    data.sort((a, b) => {
-        return parseInt(a.date) < parseInt(b.date) ? 1 : -1;
-    });
+    const [reloadPublications, setReloadPublications] = useState(false),
+        { userLogged, setUserLogged } = useContext(LoggedContext),
+        { isEditing, setIsEditing } = useContext(EditContext),
+        { isDataLoading, data, error } = useFetch(
+            `http://localhost:3001/api/publications/`,
+            [reloadPublications]
+        );
 
     async function createPublication(e) {
         e.preventDefault();
@@ -142,6 +57,9 @@ function Dashboard() {
                 setIsEditing(false);
                 e.target['textCreator'].value = '';
                 e.target['imageCreator'].value = '';
+                document
+                    .getElementById(`imageCreatorDisplay`)
+                    .classList.remove('withImg');
             } else {
                 localStorage.removeItem('user');
                 window.location = '/login';
@@ -149,6 +67,24 @@ function Dashboard() {
         } catch (err) {
             console.log(err);
         }
+    }
+
+    function autoGrow(element) {
+        element.style.height = '7em';
+        element.style.height = element.scrollHeight + 'px';
+    }
+
+    function displayImage(element) {
+        var selectedFile = element.files[0];
+        var targetImg = document.getElementById(`imageCreatorDisplay`);
+        var reader = new FileReader();
+
+        reader.onload = (e) => {
+            targetImg.src = e.target.result;
+            targetImg.classList.add('withImg');
+        };
+
+        reader.readAsDataURL(selectedFile);
     }
 
     if (error) {
@@ -160,12 +96,19 @@ function Dashboard() {
             <PublicationCreator>
                 <h1>Créer une publication</h1>
                 <FormWrapper onSubmit={createPublication}>
-                    <TextAreaWrapper
-                        required
-                        id="textCreator"
-                        name="textCreator"
-                        rows="5"
-                    ></TextAreaWrapper>
+                    <CreatorAreaWrapper>
+                        <TextAreaWrapper
+                            required
+                            id="textCreator"
+                            name="textCreator"
+                            onInput={(e) => autoGrow(e.target)}
+                        ></TextAreaWrapper>
+                        <img
+                            id="imageCreatorDisplay"
+                            src=""
+                            alt="publication"
+                        />
+                    </CreatorAreaWrapper>
                     <CreatorMenuWrapper>
                         <ImgFieldWrapper htmlFor="imageCreator">
                             <img src={iconPhoto} alt="Ajouter"></img>
@@ -174,6 +117,7 @@ function Dashboard() {
                                 id="imageCreator"
                                 name="imageCreator"
                                 accept="image/png, image/jpeg"
+                                onChange={(e) => displayImage(e.target)}
                             />
                         </ImgFieldWrapper>
                         <PublishBtnWrapper htmlFor="submit">
@@ -194,22 +138,26 @@ function Dashboard() {
                 </LoaderWrapper>
             ) : (
                 <PublicationsContainer>
-                    {data.map((publication, index) => (
-                        <Publication
-                            key={`${publication._id}-${index}`}
-                            publicationId={publication._id}
-                            likes={publication.likes}
-                            dislikes={publication.dislikes}
-                            usersLiked={publication.usersLiked}
-                            usersDisliked={publication.usersDisliked}
-                            text={publication.text}
-                            picture={publication.imageUrl}
-                            userId={publication.userId}
-                            date={publication.date}
-                            setReloadPublications={setReloadPublications}
-                            reloadPublications={reloadPublications}
-                        />
-                    ))}
+                    {data
+                        .sort((a, b) => {
+                            return parseInt(a.date) < parseInt(b.date) ? 1 : -1;
+                        })
+                        .map((publication, index) => (
+                            <Publication
+                                key={`${publication._id}-${index}`}
+                                publicationId={publication._id}
+                                likes={publication.likes}
+                                dislikes={publication.dislikes}
+                                usersLiked={publication.usersLiked}
+                                usersDisliked={publication.usersDisliked}
+                                text={publication.text}
+                                picture={publication.imageUrl}
+                                userId={publication.userId}
+                                date={publication.date}
+                                setReloadPublications={setReloadPublications}
+                                reloadPublications={reloadPublications}
+                            />
+                        ))}
                 </PublicationsContainer>
             )}
         </DashboardWrapper>
