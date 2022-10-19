@@ -8,4 +8,4 @@ STEPS:
 5)  Open new terminal
 6)  cd back
 7)  npm install
-8)  nodemon server
+8)  npm start
