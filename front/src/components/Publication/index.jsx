@@ -272,6 +272,7 @@ function Publication({
                                 onClick={() => {
                                     setEditMode(false);
                                     setIsEditing(false);
+                                    setpictureDisplayed(false);
                                 }}
                             />
                         </CancelBtnWrapper>
