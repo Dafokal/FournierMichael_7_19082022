@@ -1,33 +1,30 @@
 import styled from 'styled-components'
 import colors from '../../utils/style/colors'
-import ErrorIllustration from '../../assets/404.svg'
 
 const ErrorWrapper = styled.div`
-  margin: 30px;
+  margin: 3em 1em;
   display: flex;
   flex-direction: column;
-  background-color: ${colors.backgroundLight};
+  row-gap: 3em;
   align-items: center;
 `
 
 const ErrorTitle = styled.h1`
-  font-weight: 300;
+  text-align: center;
+  color: ${colors.primary};
 `
 
 const ErrorSubtitle = styled.h2`
-  font-weight: 300;
-  color: ${colors.secondary};
-`
-
-const Illustration = styled.img`
-  max-width: 800px;
+  font-weight: bold;
+  color: ${colors.tertiary};
 `
 
 function Error() {
   return (
     <ErrorWrapper>
-      <ErrorTitle>Oups...</ErrorTitle>
-      <Illustration src={ErrorIllustration} />
+      <ErrorTitle>
+        Oups...<br /><br />Error 404
+      </ErrorTitle>
       <ErrorSubtitle>
         Il semblerait que la page que vous cherchez n’existe pas
       </ErrorSubtitle>

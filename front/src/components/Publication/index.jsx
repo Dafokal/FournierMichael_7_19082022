@@ -68,6 +68,7 @@ function Publication({
             []
         );
 
+    // Sets state for userLike
     useEffect(() => {
         if (usersLiked.includes(userLogged.userId)) {
             setUserLike(1);
@@ -76,6 +77,7 @@ function Publication({
         }
     }, []);
 
+    // Allows the display of line breaks in publication
     useEffect(() => {
         if (editMode) {
             autoGrow(
@@ -88,6 +90,7 @@ function Publication({
         }
     }, [editMode]);
 
+    // Send a request to delete a publication
     async function deletePublication(e) {
         e.preventDefault();
         try {
@@ -113,6 +116,7 @@ function Publication({
         }
     }
 
+    // Send the request with like/dislike value
     async function likePublication(e, likeValue) {
         try {
             const response = await fetch(
@@ -151,6 +155,7 @@ function Publication({
         }
     }
 
+    // Send a request with data to modify a publication
     async function modifyPublication(e) {
         e.preventDefault();
         const formData = new FormData(),
@@ -190,11 +195,13 @@ function Publication({
         }
     }
 
+    // Adapt the height of a textArea from content
     function autoGrow(element) {
         element.style.height = '0';
         element.style.height = element.scrollHeight + 'px';
     }
 
+    // Display the image file contained in the input
     function displayImage(element) {
         var selectedFile = element.files[0];
         var reader = new FileReader();

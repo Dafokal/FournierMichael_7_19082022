@@ -29,6 +29,7 @@ function Dashboard() {
             [reloadPublications]
         );
 
+    // Sends request with data to creat a publication
     async function createPublication(e) {
         e.preventDefault();
         const formData = new FormData(),
@@ -69,11 +70,13 @@ function Dashboard() {
         }
     }
 
+    // Adapt the height of a textArea from content
     function autoGrow(element) {
         element.style.height = '7em';
         element.style.height = element.scrollHeight + 'px';
     }
 
+    // Display the image file contained in the input
     function displayImage(element) {
         var selectedFile = element.files[0];
         var targetImg = document.getElementById(`imageCreatorDisplay`);

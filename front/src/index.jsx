@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Header from './components/Header';
-import Footer from './components/Footer';
 import Error from './components/Error';
 import GlobalStyle from './utils/style/GlobalStyle';
 import { LoggedProvider } from './utils/context';
@@ -28,7 +27,6 @@ ReactDOM.render(
                             <Error />
                         </Route>
                     </Switch>
-                    <Footer />
                 </EditProvider>
             </LoggedProvider>
         </Router>

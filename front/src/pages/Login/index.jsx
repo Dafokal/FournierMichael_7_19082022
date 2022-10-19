@@ -59,6 +59,7 @@ const LoginWrapper = styled.div`
 function Login() {
     const [signupDisplay, setSignupDisplay] = useState(false);
 
+    // Send a request with data to log in the user
     async function fetchLogin(e) {
         e.preventDefault();
         const email = e.target['mail'].value,
@@ -89,6 +90,7 @@ function Login() {
         }
     }
 
+    // Send request with data to create an account
     async function fetchSignup(e) {
         e.preventDefault();
         const email = e.target['mail'].value,
