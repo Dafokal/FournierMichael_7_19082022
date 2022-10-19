@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Login from './pages/Login';
-import Signup from './pages/Signup';
 import Dashboard from './pages/Dashboard';
 import Header from './components/Header';
 import Footer from './components/Footer';
@@ -24,9 +23,6 @@ ReactDOM.render(
                         </Route>
                         <Route path="/login">
                             <Login />
-                        </Route>
-                        <Route path="/signup">
-                            <Signup />
                         </Route>
                         <Route>
                             <Error />
