@@ -7,6 +7,7 @@ const path = require('path');
 const publicationRoutes = require('./routes/publication');
 const userRoutes = require('./routes/user');
 
+// Connect to database
 mongoose.connect('mongodb+srv://OpenClassrooms:1234@cluster0.diiyn.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
   { useNewUrlParser: true,
     useUnifiedTopology: true })
@@ -17,6 +18,7 @@ const app = express();
 
 app.use(express.json());
 
+// Set headers
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -24,6 +26,7 @@ app.use((req, res, next) => {
     next();
   });
 
+// Defines the base of every routes
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.use('/api/publications', publicationRoutes);
 app.use('/api/auth', userRoutes);

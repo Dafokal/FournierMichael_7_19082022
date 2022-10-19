@@ -1,5 +1,6 @@
 const Publication = require('../models/Publication');
 
+// Checks if the user have rights on the publication
 module.exports = (req, res, next) => {
     Publication.findOne({ _id: req.params.id })
         .then(publication => {

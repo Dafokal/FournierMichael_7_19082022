@@ -6,6 +6,7 @@ const rights = require('../middleware/rights');
 const multer = require('../middleware/multer-config');
 const publicationsCtrl = require('../controllers/publication');
 
+// Defines routes for all publications requests
 router.get('/', auth, publicationsCtrl.getAllPublications);
 router.post('/', auth, multer, publicationsCtrl.createPublication);
 router.get('/:id', auth, publicationsCtrl.getOnePublication);

@@ -3,6 +3,7 @@ const fs = require('fs');
 const Publication = require('../models/Publication');
 const User = require('../models/User');
 
+// Creates a publication from data
 exports.createPublication = (req, res, next) => {
     const publicationObject = req.body;
     delete publicationObject._id;
@@ -20,12 +21,14 @@ exports.createPublication = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
 }
 
+// Get a publication from id
 exports.getOnePublication = (req, res, next) => {
     Publication.findOne({ _id: req.params.id })
         .then(publication => res.status(200).json(publication))
         .catch(error => res.status(404).json({ error }));
 }
 
+// Modify a publication from id and data
 exports.modifyPublication = (req, res, next) => {
     Publication.findOne({ _id: req.params.id })
         .then(publication => {
@@ -46,6 +49,7 @@ exports.modifyPublication = (req, res, next) => {
         .catch(error => res.status(404).json({ error }));
 };
 
+// Delete a publication from id
 exports.deletePublication = (req, res, next) => {
     Publication.findOne({ _id: req.params.id })
         .then(publication => {
@@ -60,12 +64,14 @@ exports.deletePublication = (req, res, next) => {
         .catch(error => res.status(500).json({ error }));
 };
 
+// Get all publications in database
 exports.getAllPublications = (req, res, next) => {
     Publication.find()
         .then(publications => res.status(200).json(publications))
         .catch(error => res.status(404).json({ error }));
 }
 
+// Update the like value & the list of users that likes/dislikes the publication
 exports.likePublication = (req, res, next) => {
     User.findOne({ _id: req.body.userId })
     .then(() => {

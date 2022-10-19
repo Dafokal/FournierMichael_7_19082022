@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const User = require('../models/User');
 
+// Creates an account from data by hashing the password
 exports.signup = (req, res, next) => {
     bcrypt.hash(req.body.password, 10)
         .then(hash => {
@@ -19,6 +20,7 @@ exports.signup = (req, res, next) => {
         .catch(error => res.status(500).json({ error }));
 };
 
+// Compare data from credentials in database and sends back a token
 exports.login = (req, res, next) => {
     User.findOne({ email: req.body.email })
         .then(user => {

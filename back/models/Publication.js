@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 
+// Data model of a publication
 const publicationSchema = mongoose.Schema({
   userId: { type: String, required: true },
   text: { type: String, required: true },
